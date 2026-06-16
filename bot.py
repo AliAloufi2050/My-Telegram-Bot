@@ -1,13 +1,8 @@
 import os
 import requests
-import google.generativeai as genai
 
-# إعداد المكتبة
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-
-# استخدام نموذج gemini-pro (الأكثر توافقاً مع الحسابات الحالية)
-model = genai.GenerativeModel('gemini-pro')
-
+# هذا الكود يستخدم المسار المباشر لـ Google AI Studio
+# لا يحتاج تفعيل في Google Cloud Console
 def send_telegram_message(text):
     bot_token = os.environ["BOT_TOKEN"]
     chat_id = os.environ["CHANNEL_ID"]
@@ -15,11 +10,17 @@ def send_telegram_message(text):
     payload = {"chat_id": chat_id, "text": text}
     requests.post(url, json=payload)
 
-if __name__ == "__main__":
+def get_ai_content():
+    api_key = os.environ["GEMINI_API_KEY"]
+    # المسار المباشر لـ AI Studio
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    payload = {"contents": [{"parts": [{"text": "اكتب حكمة قصيرة ومفيدة عن البرمجة"}]}]}
+    
     try:
-        # تجربة توليد محتوى باستخدام gemini-pro
-        response = model.generate_content("اكتب حكمة قصيرة عن الإصرار.")
-        send_telegram_message(response.text)
-    except Exception as e:
-        # إذا فشل، يرسل رسالة توضيحية لنعرف سبب المنع
-        send_telegram_message(f"حدث خطأ: تأكد من تفعيل خدمة Generative AI API في Google Cloud Console.")
+        response = requests.post(url, json=payload)
+        return response.json()['candidates'][0]['content']['parts'][0]['text']
+    except:
+        return "البرمجة فن وعلم، استمر في التعلم يا علي!" # حكمة احتياطية
+
+if __name__ == "__main__":
+    send_telegram_message(get_ai_content())
