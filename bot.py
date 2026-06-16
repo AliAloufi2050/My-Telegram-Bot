@@ -5,8 +5,8 @@ import google.generativeai as genai
 # إعداد مفتاح API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-# استخدام نموذج gemini-pro لضمان الاستقرار في بيئة Actions
-model = genai.GenerativeModel('gemini-pro')
+# استخدام نموذج gemini-1.5-flash كخيار حديث ومستقر
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def get_ai_content():
     try:
@@ -14,7 +14,7 @@ def get_ai_content():
         response = model.generate_content("اكتب حكمة قصيرة وملهمة عن البرمجة.")
         return response.text
     except Exception as e:
-        return f"حدث خطأ أثناء توليد المحتوى: {str(e)}"
+        return f"حدث خطأ: {str(e)}"
 
 def send_telegram_message(text):
     bot_token = os.environ["BOT_TOKEN"]
