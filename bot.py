@@ -2,11 +2,11 @@ import os
 import requests
 import google.generativeai as genai
 
-# إعداد المكتبة بالمفتاح الجديد
+# إعداد المكتبة
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-# نستخدم النموذج الأساسي والمستقر دائماً
-model = genai.GenerativeModel('gemini-1.5-flash')
+# استخدام نموذج gemini-pro (الأكثر توافقاً مع الحسابات الحالية)
+model = genai.GenerativeModel('gemini-pro')
 
 def send_telegram_message(text):
     bot_token = os.environ["BOT_TOKEN"]
@@ -17,7 +17,9 @@ def send_telegram_message(text):
 
 if __name__ == "__main__":
     try:
-        response = model.generate_content("اكتب حكمة قصيرة ومفيدة عن التكنولوجيا.")
+        # تجربة توليد محتوى باستخدام gemini-pro
+        response = model.generate_content("اكتب حكمة قصيرة عن الإصرار.")
         send_telegram_message(response.text)
     except Exception as e:
-        send_telegram_message(f"خطأ في الاتصال بالنموذج: {str(e)}")
+        # إذا فشل، يرسل رسالة توضيحية لنعرف سبب المنع
+        send_telegram_message(f"حدث خطأ: تأكد من تفعيل خدمة Generative AI API في Google Cloud Console.")
