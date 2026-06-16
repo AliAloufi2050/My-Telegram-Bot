@@ -5,13 +5,16 @@ import google.generativeai as genai
 # إعداد مفتاح API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-# إعداد النموذج
-model = genai.GenerativeModel('gemini-1.5-flash')
+# استخدام نموذج gemini-pro لضمان الاستقرار في بيئة Actions
+model = genai.GenerativeModel('gemini-pro')
 
 def get_ai_content():
-    # طلب توليد محتوى من Gemini
-    response = model.generate_content("اكتب حكمة قصيرة وملهمة عن البرمجة.")
-    return response.text
+    try:
+        # طلب توليد محتوى
+        response = model.generate_content("اكتب حكمة قصيرة وملهمة عن البرمجة.")
+        return response.text
+    except Exception as e:
+        return f"حدث خطأ أثناء توليد المحتوى: {str(e)}"
 
 def send_telegram_message(text):
     bot_token = os.environ["BOT_TOKEN"]
@@ -21,8 +24,15 @@ def send_telegram_message(text):
         "chat_id": chat_id,
         "text": text
     }
-    requests.post(url, data=payload)
+    
+    # إرسال الرسالة لتليجرام
+    response = requests.post(url, data=payload)
+    if response.status_code == 200:
+        print("تم إرسال الرسالة بنجاح!")
+    else:
+        print(f"فشل الإرسال: {response.text}")
 
 if __name__ == "__main__":
     content = get_ai_content()
+    print(f"المحتوى المولد: {content}")
     send_telegram_message(content)
