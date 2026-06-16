@@ -1,7 +1,13 @@
-name: Daily Telegram Bot
+name: TechGear AI Automation
+
 on:
   schedule:
-    - cron: '0 9 * * *'
+    # 9 صباحاً بتوقيت السعودية (06:00 UTC)
+    - cron: '0 6 * * *'
+    # 2 ظهراً بتوقيت السعودية (11:00 UTC)
+    - cron: '0 11 * * *'
+    # 8 مساءً بتوقيت السعودية (17:00 UTC)
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,11 +23,13 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install requests google-generativeai
+        run: |
+          pip install requests google-generativeai
 
-      - name: Run bot
+      - name: Run Bot
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-        run: python bot.py
+        run: |
+          python bot.py
