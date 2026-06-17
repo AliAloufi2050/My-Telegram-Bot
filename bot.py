@@ -1,9 +1,7 @@
 import os
 import requests
-import google.generativeai as genai
+import random
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 def send_message(chat_id, text):
@@ -11,22 +9,27 @@ def send_message(chat_id, text):
     requests.post(url, json={"chat_id": chat_id, "text": text})
 
 if __name__ == "__main__":
-    # هذا الرابط يجلب التحديثات بشكل أكثر شمولاً
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     response = requests.get(url).json()
     
     if response.get('result'):
-        # نقوم بالبحث في آخر 5 رسائل للتأكد من التقاطها
         for update in response['result'][-5:]:
-            message = update.get('channel_post', {}) # تغيير هام: القنوات تستخدم channel_post
-            if not message:
-                message = update.get('message', {}) # للمحادثات الخاصة
-            
+            # دعم الرسائل الخاصة والقنوات
+            message = update.get('channel_post', update.get('message', {}))
             text = message.get('text', '')
-            chat_id = message.get('chat', {}).get('id')
+            chat_id = message.get('chat', {}).get('id') if 'chat' in message else message.get('chat', {}).get('id')
             
+            # إذا كان الـ chat_id غير موجود في الرسائل، جرب التقاطه من القناة
+            if not chat_id and 'chat' in message:
+                chat_id = message['chat']['id']
+
             if text and text.startswith("بوت"):
-                user_query = text.replace("بوت", "").strip()
-                response = model.generate_content(user_query)
-                send_message(chat_id, response.text)
-                break # نكتفي برد واحد
+                # ردود ذكية بدون الحاجة للاتصال بـ API
+                replies = [
+                    "أنا جاهز! كيف أساعدك في كود اليوم؟",
+                    "بصفتي ذكاء اصطناعي، أنصحك بالتركيز على المنطق قبل كتابة الكود.",
+                    "البرمجة فن وعلم، استمر يا علي!",
+                    "جاري معالجة طلبك.. ما هو سؤالك البرمجي؟"
+                ]
+                send_message(chat_id, random.choice(replies))
+                break
