@@ -1,13 +1,8 @@
-name: TechGear AI Automation
+name: TechGear AI Bot - Fast Response
 
 on:
   schedule:
-    # 9 صباحاً بتوقيت السعودية (06:00 UTC)
-    - cron: '0 6 * * *'
-    # 2 ظهراً بتوقيت السعودية (11:00 UTC)
-    - cron: '0 11 * * *'
-    # 8 مساءً بتوقيت السعودية (17:00 UTC)
-    - cron: '0 17 * * *'
+    - cron: '* * * * *' # يعمل كل دقيقة
   workflow_dispatch:
 
 jobs:
