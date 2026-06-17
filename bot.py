@@ -1,6 +1,5 @@
 import os
 import requests
-import random
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
@@ -13,23 +12,17 @@ if __name__ == "__main__":
     response = requests.get(url).json()
     
     if response.get('result'):
-        for update in response['result'][-5:]:
-            # دعم الرسائل الخاصة والقنوات
+        # نفحص آخر 10 رسائل لضمان التقاط الرسالة
+        for update in response['result'][-10:]:
+            # نتحقق من الرسائل في القنوات أو الخاص
             message = update.get('channel_post', update.get('message', {}))
             text = message.get('text', '')
-            chat_id = message.get('chat', {}).get('id') if 'chat' in message else message.get('chat', {}).get('id')
+            chat_id = message.get('chat', {}).get('id')
             
-            # إذا كان الـ chat_id غير موجود في الرسائل، جرب التقاطه من القناة
-            if not chat_id and 'chat' in message:
-                chat_id = message['chat']['id']
+            # إذا كانت القناة، الـ chat_id قد يكون في sender_chat
+            if not chat_id and 'sender_chat' in message:
+                chat_id = message['sender_chat']['id']
 
             if text and text.startswith("بوت"):
-                # ردود ذكية بدون الحاجة للاتصال بـ API
-                replies = [
-                    "أنا جاهز! كيف أساعدك في كود اليوم؟",
-                    "بصفتي ذكاء اصطناعي، أنصحك بالتركيز على المنطق قبل كتابة الكود.",
-                    "البرمجة فن وعلم، استمر يا علي!",
-                    "جاري معالجة طلبك.. ما هو سؤالك البرمجي؟"
-                ]
-                send_message(chat_id, random.choice(replies))
+                send_message(chat_id, "أهلاً بك يا علي! أنا أسمعك، كيف أساعدك اليوم في مشروعك البرمجي؟")
                 break
